@@ -1,0 +1,8 @@
+{
+    "rokoko_ip": "192.168.0.163",
+    "rokoko_port": 14053,
+    "rokoko_api_key": "1234",
+    "rokoko_clip_name": "Clip",
+    "rokoko_frame_rate": 60
+}
+

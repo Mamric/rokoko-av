@@ -1,3 +1,4 @@
 requests>=2.25.0
 pyaudacity-x>=0.1.4
+pyinstaller>=5.0.0
 

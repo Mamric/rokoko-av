@@ -1,12 +1,15 @@
 # Rokoko Audio Video Sync Recorder
 
-A Python script that synchronously records motion capture data from Rokoko Studio and audio from Audacity, allowing you to capture both simultaneously with a single command.
+A GUI application that synchronously records motion capture data from Rokoko Studio and audio from Audacity, allowing you to capture both simultaneously with a single button click.
 
 ## Features
 
+- **GUI Interface**: Simple and intuitive graphical interface with Record/Stop button
 - **Synchronized Recording**: Start and stop both Rokoko mocap and Audacity audio recording simultaneously
-- **Continuous Recording**: Continue recording on the same Audacity track across multiple script runs
-- **Manual Control**: Simple press-Enter interface for starting and stopping recordings
+- **Real-time Logging**: Built-in log window showing recording status and messages
+- **Settings Management**: Configure Rokoko connection settings through the GUI
+- **Persistent Application**: Keep the application running and record multiple times without restarting
+- **Continuous Recording**: Continue recording on the same Audacity track across multiple recordings
 - **No Auto-Save**: You maintain full control over when and how to save your Audacity projects
 
 ## Prerequisites
@@ -54,7 +57,20 @@ pip install requests pyaudacity-x
 
 **Note**: The script uses `pyaudacity-x` which has better Windows support than the standard `pyaudacity` package.
 
-### 3. Configure Audacity
+### 3. Set Up Configuration (Optional)
+
+The application will create a default `config.json` file on first run. If you want to pre-configure settings:
+
+1. Copy the example config file:
+   ```bash
+   copy config.json.example config.json
+   ```
+
+2. Edit `config.json` with your Rokoko Studio settings, or configure them later through the GUI Settings window.
+
+See `CONFIG_TEMPLATE.md` for detailed configuration information.
+
+### 4. Configure Audacity
 
 1. **Open Audacity**
 
@@ -73,7 +89,7 @@ pip install requests pyaudacity-x
 
 5. **Keep Audacity Running**: The script requires Audacity to be running before you execute it
 
-### 4. Configure Rokoko Studio
+### 5. Configure Rokoko Studio
 
 1. **Open Rokoko Studio**
 
@@ -87,21 +103,34 @@ pip install requests pyaudacity-x
 
 ## Configuration
 
-Edit `rokoko_av.py` and adjust these settings at the top of the file:
+Configuration is managed through the Settings window in the GUI application. Click the **Settings** button in the main window to configure:
 
-```python
-# Rokoko settings (adjust as needed)
-ROKOKO_IP = "192.168.0.163"  # Change to your Rokoko Studio IP address
-ROKOKO_PORT = 14053           # Change if using a different port
-ROKOKO_API_KEY = "1234"       # Change to your Rokoko API key
-ROKOKO_CLIP_NAME = "Clip"     # Name for your Rokoko recordings
-ROKOKO_FRAME_RATE = 60        # Frame rate for mocap recording
-```
+- **Rokoko IP Address**: The IP address where Rokoko Studio is running
+- **Rokoko Port**: The port for Rokoko API (default: 14053)
+- **Rokoko API Key**: Your Rokoko API key (default: "1234")
+- **Clip Name**: Name for your Rokoko recordings
+- **Frame Rate**: Frame rate for mocap recording (default: 60)
+
+Settings are automatically saved to `config.json` in the application directory.
+
+**Note**: `config.json` is not tracked in git (it's in `.gitignore`) since it contains user-specific settings. Each user should configure their own settings through the Settings window.
+
+### Setting Up Configuration
+
+You can set up your configuration in two ways:
+
+1. **Through the GUI** (Recommended): Click the **Settings** button in the application and configure your settings there.
+
+2. **Manually**: Copy `config.json.example` to `config.json` and edit it:
+   ```bash
+   copy config.json.example config.json
+   ```
+   See `CONFIG_TEMPLATE.md` for detailed information about each configuration field.
 
 ### Finding Your Rokoko IP Address
 
-- If Rokoko Studio is on the same computer: Use `"127.0.0.1"` or `"localhost"`
-- If Rokoko Studio is on a different computer: Use that computer's local IP address (e.g., `"192.168.0.163"`)
+- If Rokoko Studio is on the same computer: Use `127.0.0.1` or `localhost`
+- If Rokoko Studio is on a different computer: Use that computer's local IP address (e.g., `192.168.0.163`)
 
 ## Usage
 
@@ -112,26 +141,45 @@ ROKOKO_FRAME_RATE = 60        # Frame rate for mocap recording
    - Your audio device is configured
    - Audacity is running (don't close it)
 
-3. **Run the Script**:
+3. **Run the Application**:
+   
+   **Option A: Run from Python**
    ```bash
    python rokoko_av.py
    ```
+   
+   **Option B: Run the Executable** (if you've built it)
+   ```bash
+   dist/rokoko-av-recorder.exe
+   ```
 
-4. **Start Recording**:
-   - Press `Enter` when prompted to start recording
+4. **Configure Settings** (if needed):
+   - Click the **Settings** button in the application window
+   - Enter your Rokoko IP address, port, API key, and other settings
+   - Click **Save**
+
+5. **Start Recording**:
+   - Click the large **RECORD** button
    - Both Rokoko and Audacity will begin recording simultaneously
+   - The button will change to **STOP** and turn red
+   - Status will show "Recording..." in red
 
-5. **Stop Recording**:
-   - Press `Enter` again when prompted to stop recording
+6. **Stop Recording**:
+   - Click the **STOP** button when you're done
    - Both recordings will stop simultaneously
+   - Status will return to "Ready" in green
 
-6. **Save Your Work**:
+7. **View Logs**:
+   - All recording activity is logged in the log window at the bottom
+   - Scroll through the log to see detailed information about each operation
+
+8. **Save Your Work**:
    - **Rokoko**: Check Rokoko Studio for your mocap file
    - **Audacity**: Manually save your project (`File → Save Project`)
 
 ### Multiple Recordings
 
-The script is designed to continue recording on the same Audacity track when run multiple times. Simply run the script again, and it will append to your existing audio track instead of creating new ones.
+The application is designed to continue recording on the same Audacity track across multiple recording sessions. Simply click **RECORD** again to start another recording, and it will append to your existing audio track instead of creating new ones. You can record multiple times without closing the application.
 
 ## Troubleshooting
 
@@ -169,20 +217,64 @@ The script is designed to continue recording on the same Audacity track when run
   pip install pyaudacity-x
   ```
 
+## Building a Standalone Executable
+
+To create a standalone `.exe` file that can run without Python installed:
+
+1. **Install PyInstaller** (if not already installed):
+   ```bash
+   pip install pyinstaller
+   ```
+   
+   **Troubleshooting**: If you get file permission errors on Windows, try:
+   - Run PowerShell/Command Prompt **as Administrator**
+   - Or use: `pip install --user pyinstaller`
+   - Or use: `pip install --force-reinstall --no-cache-dir pyinstaller`
+   - See `BUILD_TROUBLESHOOTING.md` for detailed solutions
+
+2. **Build the executable**:
+   
+   **Option A: Use the build helper script**
+   ```bash
+   python build_exe.py
+   ```
+   
+   **Option B: Use PyInstaller directly**
+   ```bash
+   pyinstaller --onefile --windowed --name=rokoko-av-recorder --clean rokoko_av.py
+   ```
+
+3. **Find your executable**:
+   - The `.exe` file will be created in the `dist` directory
+   - You can copy this file to any Windows computer and run it directly
+   - No Python installation required on the target computer!
+
+### Build Options
+
+- `--onefile`: Creates a single executable file (easier to distribute)
+- `--windowed`: No console window (GUI only)
+- `--clean`: Clean PyInstaller cache before building
+- `--name`: Custom name for the executable
+
+**Note**: The first run of the executable may be slightly slower as Windows extracts the bundled files. Subsequent runs will be faster.
+
 ## Requirements
 
-- Python 3.7 or higher
+- Python 3.7 or higher (only needed for development/building)
 - `requests` library
 - `pyaudacity-x` library (preferred) or `pyaudacity`
+- `tkinter` (usually included with Python)
 - Audacity 3.7.5 or higher with `mod-script-pipe` enabled
 - Rokoko Studio with API access enabled
 
 ## Notes
 
-- The script does **not** automatically save Audacity projects - you must save manually
+- The application does **not** automatically save Audacity projects - you must save manually
 - There is a minimal delay (~0.1 seconds) between command execution and actual recording start
-- The script will continue recording on existing Audacity tracks when run multiple times
-- Make sure both Rokoko Studio and Audacity are running before executing the script
+- The application will continue recording on existing Audacity tracks across multiple recording sessions
+- Make sure both Rokoko Studio and Audacity are running before starting a recording
+- Configuration is saved to `config.json` in the same directory as the application
+- The GUI application runs continuously - you can record multiple times without restarting
 
 ## License
 
